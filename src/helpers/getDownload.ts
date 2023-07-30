@@ -31,27 +31,39 @@ const getDLink = async ({ shareid, uk, sign, timestamp, fs_id }: any, { cookie, 
     }
 }
 
-const getUrlDownload = async (dlink: string, { userAgent, cookie }: any) => {
-    const response: any = await fetch(dlink, {
-        redirect: "follow",
-        // follow: 0,
-        headers: {
-            "User-Agent": userAgent,
-            "Accept-Language": "en-US,en;q=0.5",
-            "Sec-Fetch-Dest": "empty",
-            "Sec-Fetch-Mode": "cors",
-            "Sec-Fetch-Site": "same-origin",
-            Cookie: cookie,
-        },
-    })
+const getUrlDownload = async (dlink, { userAgent, cookie }) => {
+    try {
+        const response = await fetch(dlink, {
+            redirect: "follow",
+            headers: {
+                "User-Agent": userAgent,
+                "Accept-Language": "en-US,en;q=0.5",
+                "Sec-Fetch-Dest": "empty",
+                "Sec-Fetch-Mode": "cors",
+                "Sec-Fetch-Site": "same-origin",
+                Cookie: cookie,
+            },
+        });
 
-    if (!response.redirected) throw new Error("Failed get url download")
+        if (!response.redirected) {
+            throw new Error("Failed get url download");
+        }
 
-    return {
-        ok: true,
-        downloadLink: response.url,
+        return {
+            ok: true,
+            downloadLink: response.url,
+        };
+    } catch (error) {
+        console.error("Error while fetching download URL:", error);
+        return {
+            ok: false,
+            message: error.message,
+        };
     }
-}
+};
+
+export default getUrlDownload;
+
 
 const getDownloadLink = async (
     { shareid, uk, sign, timestamp, fs_id }: any,
